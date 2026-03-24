@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+data/
+ssh_*.json
+.pycommands
+.dbg_vscode/
