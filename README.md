@@ -29,7 +29,7 @@ choline.yaml → Search VastAI → Launch → SCP files → Run setup → Agent 
 ### Install
 
 ```bash
-pip install choline_agent
+pip install git+https://github.com/bdytx5/choline_agent.git
 ```
 
 ### Credentials Setup
