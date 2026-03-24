@@ -31,6 +31,7 @@ import subprocess
 import requests
 from datetime import datetime, timezone
 from pathlib import Path
+from choline.utils import get_ssh_key
 
 
 CREDS_FILE = Path.home() / ".choline" / "creds.yaml"
@@ -393,7 +394,7 @@ class Instance:
         if not host or not port or status != "running":
             return False
 
-        ssh_key = os.path.expanduser("~/.ssh/id_rsa")
+        ssh_key = get_ssh_key()
         r = subprocess.run(
             ["ssh", "-i", ssh_key, "-o", "StrictHostKeyChecking=no",
              "-o", "ConnectTimeout=10", "-p", port, f"root@{host}",
@@ -409,7 +410,7 @@ class Instance:
             return None
         host = d.get("ssh_host")
         port = str(d.get("ssh_port", ""))
-        ssh_key = os.path.expanduser("~/.ssh/id_rsa")
+        ssh_key = get_ssh_key()
         r = subprocess.run(
             ["ssh", "-i", ssh_key, "-o", "StrictHostKeyChecking=no",
              "-o", "ConnectTimeout=10", "-p", port, f"root@{host}", cmd],
@@ -424,7 +425,7 @@ class Instance:
             return False
         host = d.get("ssh_host")
         port = str(d.get("ssh_port", ""))
-        ssh_key = os.path.expanduser("~/.ssh/id_rsa")
+        ssh_key = get_ssh_key()
         flags = ["-i", ssh_key, "-o", "StrictHostKeyChecking=no", "-P", port]
         if os.path.isdir(local_path):
             flags.append("-r")
@@ -441,7 +442,7 @@ class Instance:
             return False
         host = d.get("ssh_host")
         port = str(d.get("ssh_port", ""))
-        ssh_key = os.path.expanduser("~/.ssh/id_rsa")
+        ssh_key = get_ssh_key()
         flags = ["-i", ssh_key, "-o", "StrictHostKeyChecking=no", "-P", port]
         r = subprocess.run(
             ["scp"] + flags + [f"root@{host}:{remote_path}", local_path],

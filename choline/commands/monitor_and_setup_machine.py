@@ -10,6 +10,7 @@ import json
 import time
 import argparse
 import platform
+from choline.utils import get_ssh_key
 import paramiko
 from scp import SCPClient
 from fnmatch import fnmatch
@@ -215,7 +216,7 @@ def check_for_choline_txt(vastai_id):
         print(f"Machine {vastai_id}: status={status}, not ready.", flush=True)
         return False
 
-    ssh_key = os.path.expanduser("~/.ssh/id_rsa")
+    ssh_key = get_ssh_key()
     result = subprocess.run(
         ["ssh", "-i", ssh_key,
          "-o", "StrictHostKeyChecking=no",

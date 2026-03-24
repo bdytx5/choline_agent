@@ -1,5 +1,6 @@
 import subprocess
 import os
+from choline.utils import get_ssh_key
 import re
 import json
 
@@ -36,7 +37,7 @@ def main():
     selected_instance_id = instance_ids[choice - 1]
 
     username, host, port = get_ssh_details_proxy(selected_instance_id)
-    key_path = os.path.expanduser("~/.ssh/id_rsa")
+    key_path = get_ssh_key()
 
     print(f"Connecting to instance {selected_instance_id} via SSH ({host}:{port})...")
     os.execvp("ssh", [

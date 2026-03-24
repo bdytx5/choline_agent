@@ -8,6 +8,13 @@ import os
 import base64
 import aiohttp
 import asyncio
+
+def get_ssh_key():
+    for name in ("id_rsa", "id_ed25519", "id_ecdsa"):
+        path = os.path.expanduser(f"~/.ssh/{name}")
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError("No SSH key found in ~/.ssh/ (tried id_rsa, id_ed25519, id_ecdsa)")
 import threading
 
 # BASE_URL = "http://35.238.138.222:8080"
