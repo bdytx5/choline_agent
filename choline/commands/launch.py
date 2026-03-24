@@ -43,7 +43,6 @@ def write_runtime_yaml():
 
     # API keys
     api_keys = dict(data.get('API_KEYS', {}))
-    api_keys.pop('CLAUDE_CODE_OAUTH_TOKEN', None)
     if api_keys:
         runtime['API_KEYS'] = api_keys
 
