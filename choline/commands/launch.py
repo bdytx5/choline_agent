@@ -51,10 +51,13 @@ def write_runtime_yaml():
     git_username = data.get('git_username', '')
     git_token = data.get('git_token', '')
     repo_name = data.get('repo_name', '')
-    if git_username and git_token and repo_name:
+    if git_username:
         runtime['git_username'] = git_username
+    if git_token:
         runtime['git_token'] = git_token
+    if repo_name:
         runtime['repo_name'] = repo_name
+    if git_username and git_token and repo_name:
         runtime['clone_url'] = f"https://{git_username}:{git_token}@github.com/{git_username}/{repo_name}.git"
 
     # Claude prompt
