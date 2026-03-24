@@ -194,7 +194,8 @@ def ask_create_repo():
         remote_url = result.stdout.decode().strip()
         if remote_url:
             print(f"Remote repository is already set: {remote_url}")
-            return True
+            existing_repo_name = remote_url.rstrip('/').split('/')[-1].replace('.git', '')
+            return existing_repo_name, git_username, github_token
         else:
             print("No remote repository is set.")
     except subprocess.CalledProcessError:
@@ -295,7 +296,7 @@ def ask_create_repo():
                 print("Push failed. You may need to push manually: git push -u origin main")
                 return False
         
-        return True
+        return repo_name, git_username, github_token
     else:
         print(f"Failed to create repository. Status code: {create_response.status_code}")
         print(create_response.json())
@@ -1309,10 +1310,12 @@ def init_command(skip_pip=False):
             except ValueError:
                 print("Invalid input, continuing with fresh init.")
 
-    # Only proceed if ask_create_repo returns True (repository created or already exists)
-    if not ask_create_repo():
+    # Only proceed if ask_create_repo returns repo info
+    repo_result = ask_create_repo()
+    if not repo_result:
         print("Repository creation unsuccessful.")
         return
+    repo_name, git_username, git_token = repo_result
 
     image = ask_for_image_choice()
     _, copy_locations = create_upload_dirs()
@@ -1366,6 +1369,9 @@ def init_command(skip_pip=False):
         claude_prompt=claude_prompt,
         shutdown_on_complete=shutdown_on_complete,
         claude_auth_mode=claude_auth_mode,
+        repo_name=repo_name,
+        git_username=git_username,
+        git_token=git_token,
     )
 
     # Offer to save as a profile
