@@ -157,7 +157,7 @@ def ssh_copy_choline(username, host, port, src, dest, ignore_patterns):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.WarningPolicy)
-    client.connect(host, port=port, username=username)
+    client.connect(host, port=port, username=username, key_filename=get_ssh_key())
     with SCPClient(client.get_transport(), progress=progress) as scp:
         if os.path.isdir(src):
             ssh_copy_choline_dir(scp, client, src, dest, ignore_patterns, username=username, host=host, port=port)
@@ -168,7 +168,7 @@ def ssh_copy(username, host, port, src, dest, ignore_patterns):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.WarningPolicy)
-    client.connect(host, port=port, username=username)
+    client.connect(host, port=port, username=username, key_filename=get_ssh_key())
     with SCPClient(client.get_transport(), progress=progress) as scp:
         if os.path.isdir(src):
             ssh_copy_directory_full_path(scp, client, src, dest, ignore_patterns, username=username, host=host, port=port)
@@ -263,7 +263,7 @@ def send_upload_locations(uhr_str, upload_locations, ignore_patterns, max_retrie
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.WarningPolicy)
-        client.connect(host, port=int(port), username=username)
+        client.connect(host, port=int(port), username=username, key_filename=get_ssh_key())
         client.exec_command("mkdir -p ~/.choline")[1].read()
         with SCPClient(client.get_transport()) as scp:
             scp.put(custom_env, "/root/.choline/custom_env.sh")
