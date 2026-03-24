@@ -11,6 +11,14 @@ import os
 
 RUNTIME_PATH = os.path.expanduser("~/.choline/choline_runtime.json")
 
+# OAuth token stored separately so it never ends up in choline_runtime.json / git
+AUTH_PATH = os.path.expanduser("~/.choline/claude_auth.json")
+if os.path.exists(AUTH_PATH):
+    with open(AUTH_PATH) as f:
+        auth = json.load(f)
+    for k, v in auth.items():
+        print(f'export {k}="{v}"')
+
 if not os.path.exists(RUNTIME_PATH):
     exit(0)
 

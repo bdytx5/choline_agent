@@ -43,6 +43,7 @@ def write_runtime_yaml():
 
     # API keys
     api_keys = dict(data.get('API_KEYS', {}))
+    api_keys.pop('CLAUDE_CODE_OAUTH_TOKEN', None)
     if api_keys:
         runtime['API_KEYS'] = api_keys
 
@@ -77,6 +78,13 @@ def write_runtime_yaml():
     runtime_path = os.path.join(choline_dir, "choline_runtime.json")
     with open(runtime_path, 'w') as f:
         json.dump(runtime, f, indent=2)
+
+    # Write OAuth token to a separate file (SCPed but never committed to git)
+    oauth_token = data.get('API_KEYS', {}).get('CLAUDE_CODE_OAUTH_TOKEN', '')
+    if oauth_token:
+        oauth_path = os.path.join(choline_dir, "claude_auth.json")
+        with open(oauth_path, 'w') as f:
+            json.dump({"CLAUDE_CODE_OAUTH_TOKEN": oauth_token}, f)
 
 
 def read_setup_from_choline_yaml_and_write_sh_to_disk():
