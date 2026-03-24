@@ -8,5 +8,3 @@ data/
 ssh_*.json
 .pycommands
 .dbg_vscode/
-.choline/claude_auth.json
-.choline/choline_runtime.json
