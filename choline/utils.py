@@ -10,11 +10,18 @@ import aiohttp
 import asyncio
 
 def get_ssh_key():
+    # Use SUDO_USER home if running under sudo, so we find the real user's keys
+    sudo_user = os.environ.get("SUDO_USER")
+    if sudo_user:
+        import pwd
+        home = pwd.getpwnam(sudo_user).pw_dir
+    else:
+        home = os.path.expanduser("~")
     for name in ("id_rsa", "id_ed25519", "id_ecdsa"):
-        path = os.path.expanduser(f"~/.ssh/{name}")
+        path = os.path.join(home, ".ssh", name)
         if os.path.exists(path):
             return path
-    raise FileNotFoundError("No SSH key found in ~/.ssh/ (tried id_rsa, id_ed25519, id_ecdsa)")
+    raise FileNotFoundError(f"No SSH key found in {home}/.ssh/ (tried id_rsa, id_ed25519, id_ecdsa)")
 import threading
 
 # BASE_URL = "http://35.238.138.222:8080"
