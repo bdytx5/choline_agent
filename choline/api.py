@@ -633,46 +633,48 @@ class Instance:
         finally:
             os.chdir(orig_dir)
 
-    def wait_for_complete(self, poll_interval=30, timeout=3600, download_path=None):
+    def wait_for_complete(self, poll_interval=30, timeout=3600, completion_file="complete.txt", branch="main"):
         """
-        Poll the remote machine for ~/repo/complete.txt.
-        When found, reads the contents and optionally downloads the file.
+        Poll the GitHub repo for the completion file.
 
         Args:
             poll_interval: Seconds between checks (default 30)
             timeout: Max seconds to wait (default 3600 = 1hr)
-            download_path: If set, SCP complete.txt to this local path.
+            completion_file: File to check for in the repo (default "complete.txt")
+            branch: Git branch to check (default "main")
 
         Returns:
-            String contents of complete.txt on success, None on timeout.
+            String contents of the completion file on success, None on timeout.
         """
-        cid = self.winner_id or (self.contract_ids[0] if self.contract_ids else None)
-        if not cid:
-            print("No instance to monitor.")
+        repo_name = self.data.get('repo_name')
+        git_username = self.data.get('git_username')
+        git_token = self.data.get('git_token')
+
+        if not repo_name or not git_username or not git_token:
+            print("Missing repo_name, git_username, or git_token — cannot poll GitHub.")
             return None
 
-        print(f"Monitoring instance {cid} for complete.txt...", flush=True)
+        print(f"Monitoring repo {git_username}/{repo_name} for {completion_file}...", flush=True)
         elapsed = 0
         while elapsed < timeout:
-            out = self._ssh_cmd(cid, "cat ~/repo/complete.txt 2>/dev/null")
-            if out is not None and len(out.strip()) > 0:
-                contents = out.strip()
-                print(f"complete.txt found after {elapsed}s!")
-                print(f"Contents:\n{contents}")
-
-                # Download the file locally if requested
-                if download_path:
-                    self._scp_from_remote(cid, "~/repo/complete.txt", download_path)
-                    print(f"Downloaded to {download_path}")
-
-                return contents
+            url = f"https://api.github.com/repos/{git_username}/{repo_name}/contents/{completion_file}?ref={branch}"
+            try:
+                resp = requests.get(url, auth=(git_username, git_token),
+                                    headers={"Accept": "application/vnd.github.v3.raw"})
+                if resp.status_code == 200 and len(resp.text.strip()) > 0:
+                    contents = resp.text.strip()
+                    print(f"{completion_file} found after {elapsed}s!")
+                    print(f"Contents:\n{contents}")
+                    return contents
+            except Exception as e:
+                print(f"  WARNING: GitHub API error: {e}", flush=True)
 
             time.sleep(poll_interval)
             elapsed += poll_interval
             if elapsed % 120 == 0:
                 print(f"  Still waiting... ({elapsed}s elapsed)", flush=True)
 
-        print(f"Timeout after {timeout}s. complete.txt not found.")
+        print(f"Timeout after {timeout}s. {completion_file} not found.")
         return None
 
     def check_status(self):
