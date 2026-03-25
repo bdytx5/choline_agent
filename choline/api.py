@@ -633,7 +633,7 @@ class Instance:
         finally:
             os.chdir(orig_dir)
 
-    def wait_for_complete(self, poll_interval=30, timeout=3600, completion_file="complete.txt", branch="main"):
+    def wait_for_complete(self, poll_interval=30, timeout=3600, completion_file="complete.txt", branch=None):
         """
         Poll the GitHub repo for the completion file.
 
@@ -654,7 +654,19 @@ class Instance:
             print("Missing repo_name, git_username, or git_token — cannot poll GitHub.")
             return None
 
-        print(f"Monitoring repo {git_username}/{repo_name} for {completion_file}...", flush=True)
+        # Auto-detect default branch if none specified
+        if branch is None:
+            try:
+                repo_url = f"https://api.github.com/repos/{git_username}/{repo_name}"
+                resp = requests.get(repo_url, auth=(git_username, git_token))
+                if resp.status_code == 200:
+                    branch = resp.json().get("default_branch", "main")
+                else:
+                    branch = "main"
+            except Exception:
+                branch = "main"
+
+        print(f"Monitoring repo {git_username}/{repo_name} ({branch}) for {completion_file}...", flush=True)
         elapsed = 0
         while elapsed < timeout:
             url = f"https://api.github.com/repos/{git_username}/{repo_name}/contents/{completion_file}?ref={branch}"
