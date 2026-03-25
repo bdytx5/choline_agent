@@ -26,10 +26,10 @@ for k in ('git_username', 'git_token', 'repo_name', 'clone_url'):
     if k in rt:
         print(f'export {k.upper()}="{rt[k]}"')
 
-# Claude prompt
+# Claude prompt — use single quotes to avoid shell interpretation of special chars
 if 'claude_prompt' in rt:
-    p = rt['claude_prompt'].replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
-    print(f'export CHOLINE_CLAUDE_PROMPT="{p}"')
+    p = rt['claude_prompt'].replace("'", "'\\''")
+    print(f"export CHOLINE_CLAUDE_PROMPT='{p}'")
 
 # Claude model
 if 'claude_model' in rt:
