@@ -209,6 +209,17 @@ class Instance:
             runtime['repo_name'] = repo_name
             runtime['clone_url'] = f"https://{git_username}:{git_token}@github.com/{git_username}/{repo_name}.git"
 
+        # Vast.ai API key — read from ~/.vast_api_key so instances can self-destroy
+        try:
+            vast_key_path = os.path.expanduser("~/.vast_api_key")
+            if os.path.exists(vast_key_path):
+                with open(vast_key_path) as vf:
+                    vast_key = vf.read().strip()
+                if vast_key:
+                    runtime['vastai_api_key'] = vast_key
+        except Exception:
+            pass
+
         if runtime:
             runtime_path = os.path.join(choline_dir, "choline_runtime.json")
             with open(runtime_path, 'w') as f:

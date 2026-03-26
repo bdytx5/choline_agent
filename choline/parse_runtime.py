@@ -46,3 +46,7 @@ if rt.get('destroy_on_agent_complete'):
 # Max life in minutes
 if rt.get('max_life'):
     print(f'export CHOLINE_MAX_LIFE="{rt["max_life"]}"')
+
+# Vast.ai API key — overwrite CONTAINER_API_KEY so self-destroy uses account key
+if rt.get('vastai_api_key'):
+    print(f'export CONTAINER_API_KEY="{rt["vastai_api_key"]}"')

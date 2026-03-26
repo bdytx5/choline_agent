@@ -70,6 +70,17 @@ def write_runtime_yaml():
     if claude_model:
         runtime['claude_model'] = claude_model
 
+    # Vast.ai API key — read from ~/.vast_api_key so instances can self-destroy
+    try:
+        vast_key_path = os.path.expanduser("~/.vast_api_key")
+        if os.path.exists(vast_key_path):
+            with open(vast_key_path) as vf:
+                vast_key = vf.read().strip()
+            if vast_key:
+                runtime['vastai_api_key'] = vast_key
+    except Exception:
+        pass
+
     if not runtime:
         return
 
